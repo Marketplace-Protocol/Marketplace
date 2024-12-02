@@ -1,0 +1,8 @@
+requests
+flask
+loguru
+shortuuid
+stripe
+inflection
+pymongo
+mongo-taskqueue

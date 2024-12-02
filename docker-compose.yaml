@@ -1,0 +1,12 @@
+version: "3.13"
+
+services:
+  server:
+    build: .
+    ports:
+      - "8080:5000"
+    volumes:
+      - type: bind
+        source: .
+        target: /usr/src/application
+    env_file: .env.development
