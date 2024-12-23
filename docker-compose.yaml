@@ -1,7 +1,7 @@
 version: "3.13"
 
 services:
-  server:
+  web:
     build: .
     ports:
       - "8080:5000"
@@ -17,6 +17,8 @@ services:
       - redis
       - worker
       - mongodb
+      - elasticsearch
+      - kibana
 
   mongodb:
     image: mongo:latest
