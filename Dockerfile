@@ -5,8 +5,8 @@ FROM python:3.13
 WORKDIR /Marketplace
 
 # Set permissions on the definitions.json file
-COPY definitions.json /etc/rabbitmq/
-RUN chmod 600 /etc/rabbitmq/definitions.json
+#COPY definitions.json /etc/rabbitmq/
+#RUN chmod 600 /etc/rabbitmq/definitions.json
 
 
 # Install system dependencies
