@@ -1,0 +1,23 @@
+gevent
+pika
+
+requests
+flask
+loguru
+shortuuid
+stripe
+inflection
+pymongo
+mongo-taskqueue
+Werkzeug
+Authlib
+
+celery
+amqp
+
+redis
+# msgspec is ore-requisite to flask-session, and needs to be installed this way for python3.13
+msgspec @ git+https://github.com/jcrist/msgspec.git@main#egg=msgspec
+flask-session
+
+elasticsearch

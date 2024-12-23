@@ -1,0 +1,84 @@
+version: "3.13"
+
+services:
+  server:
+    build: .
+    ports:
+      - "8080:5000"
+      - "443:443"  # Expose port 443 for HTTPS (if using SSL)
+    volumes:
+      - type: bind
+        source: .
+        target: /Marketplace
+    env_file: .env.development
+    restart: always
+    depends_on:
+      - rabbitmq
+      - redis
+      - worker
+      - mongodb
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    volumes:
+      - mongodbdata:/data/db
+    ports:
+      - "27017:27017"
+
+  redis:
+    image: redis:alpine  # Use the official Redis image (Alpine version for smaller size)
+    ports:
+      - "6379:6379"
+
+  rabbitmq: # Add RabbitMQ service
+    image: rabbitmq:3-management  # Use the official RabbitMQ image with management plugin
+    command:
+      - rabbitmq-server
+      - -load_definitions
+      - /etc/rabbitmq/definitions.json
+    ports:
+      - "5672:5672"  # Standard AMQP port
+      - "15672:15672"  # Management plugin port
+#    environment:
+#      - RABBITMQ_LOG_LEVEL=debug
+    volumes:
+      - ./definitions.json:/etc/rabbitmq/definitions.json
+
+  worker: # Add a Celery worker service
+    build: .
+    command: celery -A app worker --loglevel=info -Q default
+    env_file: .env.development
+    restart: always
+    volumes:
+      - type: bind
+        source: .
+        target: /Marketplace
+    depends_on:
+      - redis
+      - rabbitmq
+      - mongodb
+      - elasticsearch
+      - kibana
+
+  elasticsearch:
+    image: elasticsearch:7.17.8  # Use a suitable Elasticsearch version
+    environment:
+      - discovery.type=single-node
+#      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"  # Expose Elasticsearch port
+      - "9300:9300"
+
+  kibana:
+    image: kibana:7.17.8  # Use the corresponding Kibana version
+    ports:
+      - "5601:5601"  # Expose Kibana port
+    depends_on:
+      - elasticsearch
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+
+volumes:
+  mongodbdata:
