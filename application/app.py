@@ -32,7 +32,8 @@ def log_to_elasticsearch(record):
             context_id = g.get("context_id")
             entry_point = g.get("entry_point")
         except RuntimeError as e:
-            logger.error("Error accessing critical values of log", kv={'error': str(e)})
+            pass
+            # logger.error("Error accessing critical values of log", kv={'error': str(e)})
 
         # Extract relevant data from the record
         log_record = record.record
