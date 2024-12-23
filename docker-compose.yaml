@@ -34,17 +34,17 @@ services:
 
   rabbitmq: # Add RabbitMQ service
     image: rabbitmq:3-management  # Use the official RabbitMQ image with management plugin
-    command:
-      - rabbitmq-server
-      - -load_definitions
-      - /etc/rabbitmq/definitions.json
+#    command:
+#      - rabbitmq-server
+#      - -load_definitions
+#      - /etc/rabbitmq/definitions.json
     ports:
       - "5672:5672"  # Standard AMQP port
       - "15672:15672"  # Management plugin port
 #    environment:
 #      - RABBITMQ_LOG_LEVEL=debug
-    volumes:
-      - ./definitions.json:/etc/rabbitmq/definitions.json
+#    volumes:
+#      - ./definitions.json:/etc/rabbitmq/definitions.json
 
   worker: # Add a Celery worker service
     build: .
