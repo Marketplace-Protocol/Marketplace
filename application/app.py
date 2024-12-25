@@ -158,5 +158,5 @@ logger.add(log_to_elasticsearch, serialize=lambda record: json.dumps(record))
 
 
 if __name__ == '__main__':
-    flask_app.run(host='0.0.0.0', debug=True, threaded=True, port=8080)
+    flask_app.run(host='0.0.0.0', debug=False, threaded=True, port=8080)
 
