@@ -8,6 +8,7 @@ class MongoRepositoryBase:
     def __init__(self) -> None:
         self.client = MongoClient(
             MONGODB_CONNECT_URL,
-            server_api=ServerApi('1')
+            server_api=ServerApi('1'),
+            ssl = True
         )
         self.db = self.client.db_marketplace_protocol

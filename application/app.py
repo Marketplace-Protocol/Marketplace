@@ -32,7 +32,8 @@ def log_to_elasticsearch(record):
             context_id = g.get("context_id")
             entry_point = g.get("entry_point")
         except RuntimeError as e:
-            logger.error("Error accessing critical values of log", kv={'error': str(e)})
+            pass
+            # logger.error("Error accessing critical values of log", kv={'error': str(e)})
 
         # Extract relevant data from the record
         log_record = record.record
@@ -157,5 +158,5 @@ logger.add(log_to_elasticsearch, serialize=lambda record: json.dumps(record))
 
 
 if __name__ == '__main__':
-    flask_app.run(host='0.0.0.0', debug=True, threaded=True, port=5000)
+    flask_app.run(host='0.0.0.0', debug=False, threaded=True, port=8080)
 

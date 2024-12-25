@@ -1,11 +1,10 @@
 version: "3.13"
 
 services:
-  server:
+  web:
     build: .
     ports:
-      - "8080:5000"
-      - "443:443"  # Expose port 443 for HTTPS (if using SSL)
+      - "5000:5000"
     volumes:
       - type: bind
         source: .
@@ -17,6 +16,8 @@ services:
       - redis
       - worker
       - mongodb
+      - elasticsearch
+      - kibana
 
   mongodb:
     image: mongo:latest
@@ -34,17 +35,17 @@ services:
 
   rabbitmq: # Add RabbitMQ service
     image: rabbitmq:3-management  # Use the official RabbitMQ image with management plugin
-    command:
-      - rabbitmq-server
-      - -load_definitions
-      - /etc/rabbitmq/definitions.json
+#    command:
+#      - rabbitmq-server
+#      - -load_definitions
+#      - /etc/rabbitmq/definitions.json
     ports:
       - "5672:5672"  # Standard AMQP port
       - "15672:15672"  # Management plugin port
 #    environment:
 #      - RABBITMQ_LOG_LEVEL=debug
-    volumes:
-      - ./definitions.json:/etc/rabbitmq/definitions.json
+#    volumes:
+#      - ./definitions.json:/etc/rabbitmq/definitions.json
 
   worker: # Add a Celery worker service
     build: .
@@ -79,6 +80,22 @@ services:
       - elasticsearch
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+
+  nginx: # Define your Nginx service here
+    image: nginx:latest  # Or your preferred Nginx image
+    ports:
+      - "80:80"
+      - "443:443"  # If using HTTPS
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/marketplaceprotocol_nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/proxy_params:/etc/nginx/proxy_params
+      - ./nginx/mime.types:/etc/nginx/mime.types
+      - ./nginx/html:/var/www/marketplaceprotocol/html  # If you have static files
+      - /etc/letsencrypt:/etc/letsencrypt     # The host needs to have certificate with letsencrypt
+    depends_on:
+      - web
+    restart: always
 
 volumes:
   mongodbdata:
