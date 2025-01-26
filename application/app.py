@@ -145,13 +145,13 @@ celery_app = make_celery(flask_app)
 # Register blueprints
 from application.routes.orders import orders_blueprint
 from application.routes.wallet import wallet_blueprint
-from application.routes.offers import offers_blueprint
 from application.routes.user import user_blueprint
+from application.routes.purchase_intent import purchase_intent_blueprint
 
 flask_app.register_blueprint(wallet_blueprint)
-flask_app.register_blueprint(offers_blueprint)
 flask_app.register_blueprint(user_blueprint)
 flask_app.register_blueprint(orders_blueprint)
+flask_app.register_blueprint(purchase_intent_blueprint)
 
 # Stream logs to kibana
 logger.add(log_to_elasticsearch, serialize=lambda record: json.dumps(record))

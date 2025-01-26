@@ -5,6 +5,7 @@ from typing import Optional, Union, Dict, List
 
 from application.models.models_utility import MongoModels
 from application.models.order import LineItem
+from application.models.product import SwapWebAppProductDetails
 from application.utils import now_in_epoch_sec
 
 PURCHASE_RECORD_CREATED = 'CREATED'
@@ -31,13 +32,15 @@ class PurchaseRecord(MongoModels):
     record_id: str
     created_at: int
     last_updated_at: int
-    description: str
-    user_id: str
     entity: str
     status: str
     attempt_count: int
+    product_details: SwapWebAppProductDetails
     line_items: List[LineItem]
     progress_note: List[str]
+
+    description: Optional[str] = None
+    user_id: Optional[str] = None
     order_id: Optional[str] = None
 
     def __post_init__(self) -> None:
@@ -47,6 +50,9 @@ class PurchaseRecord(MongoModels):
                 line_items.append(LineItem(**li))
         if line_items:
             self.line_items = line_items
+
+        if isinstance(self.product_details, dict):
+            self.product_details = SwapWebAppProductDetails(**self.product_details)
 
     def get_id(self) -> Union[str, int]:
         return self.record_id

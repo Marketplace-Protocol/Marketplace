@@ -54,9 +54,11 @@ class StripeWebhookProvider(WebhookProvider):
 
 
     def process(self, webhook: Any) -> None:
-        logger.info("Stripe webhook received")
+        logger.info("Stripe webhook received", kv=webhook)
         event = self.validate_and_construct(webhook=webhook)
         self.validate_context(event=event)
+
+        logger.info("Stripe webhook validated", kv=webhook)
 
         event_id = event.get('id')
         event_type = self.EVENT_TYPE_MAPPER[event.get('type')]
@@ -66,6 +68,9 @@ class StripeWebhookProvider(WebhookProvider):
             actor='stripe',
             type=event_type
         )
+
+        logger.info("webhook instruction created", kv=webhook)
+
         stripe_object = self.extract_transaction_from_webhook(event=event)
         logger.info(stripe_object)
         metadata = stripe_object.get('metadata')
@@ -73,11 +78,13 @@ class StripeWebhookProvider(WebhookProvider):
 
         controller = self.EVENT_CONTROLLER_HANDLER[webhook_instruction.type]
 
-        controller.process(
+        controller.create(
             transaction_id = transaction_id,
             provider='stripe',
             data=stripe_object
         )
+
+        logger.info("webhook processed", kv=webhook)
 
         return
 

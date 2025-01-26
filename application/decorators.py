@@ -120,7 +120,70 @@ def user_session_management_error_handler(func):
     return wrapper
 
 
-def offer_generation_error_handler(func):
+def order_error_handler(func):
+    """Decorator to handle errors in a function.
+    Args:
+    func: The function to decorate.
+
+    Returns:
+    The decorated function.
+    """
+    @functools.wraps(func)  # Preserve original function metadata
+    def wrapper(*args, **kwargs):
+        err = None
+        status_code = 200
+        try:
+            return func(*args, **kwargs)
+        except ValidationError as e:
+            err = e
+            status_code = 400
+            return json.dumps(
+                {
+                    'error_details': {
+                        'error_type': _convert_from_camel_to_snake(e.__class__.__name__),
+                        'error_details': str(e),
+                        'error_message': 'Request parameter is malformed...'
+                    }
+                }
+            ), status_code
+        except ContextValidationError as e:
+            err = e
+            status_code = 422
+            return json.dumps(
+                {
+                    'error_details': {
+                        'error_type': _convert_from_camel_to_snake(e.__class__.__name__),
+                        'error_details': str(e),
+                        'error_message': 'Unprocessable user request. Please try again!'
+                    }
+                }
+            ), status_code
+        except Exception as e:
+            err = e
+            status_code = 500
+            return json.dumps(
+                {
+                    'error_details': {
+                        'error_type': _convert_from_camel_to_snake(e.__class__.__name__),
+                        'error_details': str(e),
+                        'error_message': 'Unknown failure.'
+                    }
+                }
+            ), status_code
+        finally:
+            function_name = func.__name__
+            if err:
+                logger.info("Marketplace returning error response", kv={
+                    'status_code': status_code,
+                    'error_type': _convert_from_camel_to_snake(err.__class__.__name__),
+                    'error_details': str(err),
+                    'function_name': function_name
+                })
+
+    return wrapper
+
+
+def purchase_intent_error_handler(func):
     """Decorator to handle errors in a function.
     Args:
     func: The function to decorate.

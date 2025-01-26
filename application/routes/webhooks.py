@@ -18,6 +18,6 @@ def handle_stripe_webhooks():
     -------
     order, status of processing, expected time, delivery method
     """
-    stripe_webhook_provider.process(webhook=request)
+    stripe_webhook_provider.create(webhook=request)
     res = {'status': 'success'}
     return json.dumps(res), 200

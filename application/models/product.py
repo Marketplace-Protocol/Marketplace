@@ -1,7 +1,7 @@
 import datetime
 
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Dict
 
 from application.errors import ContextValidationError
 from application.models.models_utility import StrictTypeModels
@@ -17,18 +17,19 @@ class ProductDetails(StrictTypeModels):
 
 @dataclass
 class SwapWebAppProductDetails(ProductDetails):
-    swap_mode: str
-    input_file_name: str
-    target_file_name: str
+    mode: str
+    source_file: str
+    target_file: str
+    output_file: str
     face_enhancer: bool
     quality: str
     expedited: bool
-    input_file_size: int = 0
+    source_file_size: int = 0
     target_file_size: int = 0
 
     def generate_line_items(self) -> List[LineItem]:
         li_dict = {}
-        if self.swap_mode == 'image':
+        if self.mode == 'image':
             li_dict['base-product'] = LineItem(
                 product_code='image_face_swap',
                 product_name='Face Swap (Image)',
@@ -40,7 +41,7 @@ class SwapWebAppProductDetails(ProductDetails):
                 ),
                 description='AI image generation for faceswap'
             )
-        elif self.swap_mode == 'video':
+        elif self.mode == 'video':
             li_dict['base-product'] = LineItem(
                 product_code='video_face_swap',
                 product_name='Face Swap (Video)',
@@ -52,7 +53,7 @@ class SwapWebAppProductDetails(ProductDetails):
                 ),
                 description='AI video generation for faceswap'
             )
-        elif self.swap_mode == 'vr':
+        elif self.mode == 'vr':
             li_dict['base-product'] = LineItem(
                 product_code='vr_face_swap',
                 product_name='Face Swap (VR)',
@@ -113,8 +114,11 @@ class SwapWebAppProductDetails(ProductDetails):
 
 @dataclass
 class MarketplaceProductOffer:
+    # Per record
+    record_id: str
     entity: str
     line_items: List[LineItem]
+    storage_provider_urls: Dict[str, str]
 
     def total_price(self) -> Money:
         price = 0

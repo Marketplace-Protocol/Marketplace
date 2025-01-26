@@ -21,3 +21,5 @@ msgspec @ git+https://github.com/jcrist/msgspec.git@main#egg=msgspec
 flask-session
 
 elasticsearch
+
+boto3

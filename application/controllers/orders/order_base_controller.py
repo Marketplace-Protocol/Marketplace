@@ -1,11 +1,10 @@
 from typing import List
 
-from application.controllers.purchase_record_controller import PurchaseRecordController
 from application.models.order import Order
-from application.models.purchase_record import PurchaseRecord, PURCHASE_RECORD_READY, PURCHASE_RECORD_CREATED, \
-    PURCHASE_RECORD_FAILED
+from application.models.purchase_record import PurchaseRecord, PURCHASE_RECORD_READY
 from application.models.transactions import Transaction
 from application.repositories.order_repository import OrderRepository
+from application.repositories.purchase_record_repository import PurchaseRecordRepository
 
 
 class OrderBaseController:
@@ -13,10 +12,10 @@ class OrderBaseController:
     def __init__(
             self,
             order_repo: OrderRepository,
-            purchase_record_controller: PurchaseRecordController
+            purchase_record_repo: PurchaseRecordRepository
     ) -> None:
         self.order_repo = order_repo
-        self.purchase_record_controller = purchase_record_controller
+        self.purchase_record_repo = purchase_record_repo
 
     def post_payment_process(
             self,
@@ -95,18 +94,12 @@ class OrderBaseController:
             purchase_records: List[PurchaseRecord]
     ) -> None:
 
-        if order.is_created():
-            for record in purchase_records:
-                # If not already created?
-                record.status = PURCHASE_RECORD_CREATED
-                self.purchase_record_controller.process(record=record)
-
-        elif order.is_booked():
+        if order.is_booked():
             for record in purchase_records:
                 # If not already booked?
                 record.status = PURCHASE_RECORD_READY
                 record.order_id = order.order_id
-                self.purchase_record_controller.process(record=record)
+                self.purchase_record_repo.update_record(record=record)
 
         elif order.is_failed():
             pass

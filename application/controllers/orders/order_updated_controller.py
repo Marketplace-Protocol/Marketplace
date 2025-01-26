@@ -3,9 +3,9 @@ from typing import Any
 from loguru import logger
 
 from application.controllers.orders.order_base_controller import OrderBaseController
-from application.controllers.purchase_record_controller import PurchaseRecordController
 from application.providers.stripe_charge_provider import StripeChargeProvider
 from application.repositories.order_repository import OrderRepository
+from application.repositories.purchase_record_repository import PurchaseRecordRepository
 from application.repositories.transaction_repository import TransactionRepository
 
 
@@ -18,12 +18,12 @@ class OrderUpdatedController(OrderBaseController):
             self,
             txn_repo: TransactionRepository,
             order_repo: OrderRepository,
-            purchase_record_controller: PurchaseRecordController
+            purchase_record_repo: PurchaseRecordRepository
     ) -> None:
         self.txn_repo = txn_repo
         super().__init__(
             order_repo=order_repo,
-            purchase_record_controller=purchase_record_controller
+            purchase_record_repo=purchase_record_repo
         )
 
     def process(
@@ -73,5 +73,5 @@ class OrderUpdatedController(OrderBaseController):
 order_updated_controller = OrderUpdatedController(
     txn_repo=TransactionRepository(),
     order_repo=OrderRepository(),
-    purchase_record_controller=PurchaseRecordController()
+    purchase_record_repo=PurchaseRecordRepository()
 )

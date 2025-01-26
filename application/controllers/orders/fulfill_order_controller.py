@@ -1,11 +1,9 @@
 from typing import List
 
 from application.controllers.orders.order_base_controller import OrderBaseController
-from application.controllers.purchase_record_controller import PurchaseRecordController
 from application.controllers.transactions.create_transaction_controller import CaptureAuthController, \
     VoidAuthController, CreateAuthController
-from application.errors import PaymentCreationError, UserActionRequiredError, OrderProcessing, UnexpectedStatus, \
-    OrderFulfilled
+from application.errors import PaymentCreationError, OrderProcessing
 from application.models.money import Money
 from application.models.order import Order, Invoice
 from application.models.purchase_record import PurchaseRecord, PURCHASE_RECORD_FAILED
@@ -31,7 +29,7 @@ class FulfillOrderController(OrderBaseController):
         self.task_queue = TaskQueueService()
         super().__init__(
             order_repo=self.order_repo,
-            purchase_record_controller=PurchaseRecordController()
+            purchase_record_repo=self.purchase_record_repo
         )
 
     def process(self, order_id: str) -> None:
@@ -80,12 +78,11 @@ class FulfillOrderController(OrderBaseController):
                 'order_status': order.status,
             })
 
-        if order.is_terminal():
-            self.post_process_order(order=order)
-            logger.info("Completed order fulfillment executed", kv={
-                'order_id': order.order_id,
-                'order_status': order.status,
-            })
+        self.post_process_order(order=order)
+        logger.info("Completed order fulfillment executed", kv={
+            'order_id': order.order_id,
+            'order_status': order.status,
+        })
 
     def process_created_order(
             self,
